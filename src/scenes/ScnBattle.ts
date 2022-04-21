@@ -3,6 +3,7 @@ import { BattleCharacter } from './../units/BattleCharacter';
 import { GameState } from './../GameState';
 import {AttackMenu} from './../menus/AttackMenu';
 import { CombatEngine } from "../combat/CombatEngine";
+import { HpBar } from "../menus/HpBar";
 
 enum State{
     waiting,
@@ -40,26 +41,9 @@ export class ScnBattle extends Container {
         this.allyCount = gameState.allies;
         this.enemyCount = gameState.enemies;
 
-        for(var i = 0; i < this.allyCount; i++) {
-            let ally = new BattleCharacter("./units/crusader.png", this, i, [10, 2]);
-            ally.sprite.anchor.set(0.5, 0.5);
-            ally.sprite.scale.set(0.3, 0.3);
-            ally.sprite.x = this.screenWidth / 10 * (i+1);
-            ally.sprite.y = this.screenHeight / 2;
-            this.allies.push(ally);
-            this.addChild(ally.sprite);
-        }
-
-        for(var i = 0; i < this.enemyCount; i++) {
-            let enemy = new BattleCharacter("./units/crusader.png", this, i+this.allyCount, [10, 2]);
-            enemy.sprite.anchor.set(0.5, 0.5);
-            enemy.sprite.scale.set(-0.3, 0.3);
-            enemy.sprite.x = this.screenWidth / 10 * (i+6);
-            enemy.sprite.y = this.screenHeight / 2;
-            this.enemies.push(enemy);
-            this.addChild(enemy.sprite);
-        }
-        
+        this.initializeAllies();
+        this.initializeEnemies();
+    
         this.on("changedTarget", this.onChangedTarget, this);
         this.on("atkBttn", this.onAttack, this);
         this.on("characterDeath", this.onCharacterDeath, this);
@@ -68,6 +52,49 @@ export class ScnBattle extends Container {
         this.cEngine = new CombatEngine();
          
     }
+    private initializeAllies(){
+        for(var i = 0; i < this.allyCount; i++) {
+            let hp_dmg = [10, 2];
+            let x = this.screenWidth / 10 * (i+1);
+            let y = this.screenHeight / 2;
+            let pos = [x, y];
+
+            let ally = new BattleCharacter("./units/crusader.png", this, i, hp_dmg, pos);
+            ally.sprite.anchor.set(0.5, 0.5);
+            ally.sprite.scale.set(0.3, 0.3);          
+
+            this.allies.push(ally);
+
+            let sprites = ally.getSprites();
+
+            for(let j = 0; j < sprites.length; j++){
+                this.addChild(sprites[j]);
+            }
+        }
+    }
+
+    private initializeEnemies(){
+        for(var i = 0; i < this.enemyCount; i++) {
+            let hp_dmg = [10, 2];
+            let x = this.screenWidth / 10 * (i+6);
+            let y = this.screenHeight / 2;
+            let pos = [x, y]
+            let enemy = new BattleCharacter("./units/crusader.png", this, i+this.allyCount, hp_dmg, pos);
+            enemy.sprite.anchor.set(0.5, 0.5);
+            enemy.sprite.scale.set(-0.3, 0.3);
+            
+            this.enemies.push(enemy);
+            this.addChild(enemy.sprite);
+
+            let hpBar = new HpBar(x, y*2/5, hp_dmg[0]);
+            let hpSprites = hpBar.getSprites();
+
+            for(let j = 0; j < hpSprites.length; j++){
+                this.addChild(hpSprites[j]);
+            }
+        }
+    }
+
     private onChangedTarget(): void {
         console.log("BattleScene", this.lastClicked);
         

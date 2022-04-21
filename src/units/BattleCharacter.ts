@@ -1,7 +1,6 @@
 import { Sprite, InteractionEvent, utils} from "pixi.js";
+import { HpBar } from "../menus/HpBar";
 import { ScnBattle } from "../scenes/ScnBattle";
-
-
 
 export class BattleCharacter extends utils.EventEmitter{
 
@@ -13,17 +12,34 @@ export class BattleCharacter extends utils.EventEmitter{
     public dmg: number;
 
     public receiveDamage: boolean = false;
+    private hpBar: HpBar;
 
-    constructor(sprite: string, scnBattle: ScnBattle, idx: number, stats: number[]) {
+    constructor(sprite: string, scnBattle: ScnBattle, idx: number, stats: number[], pos: number[]) {
         super();
         this.sprite = Sprite.from(sprite);
         this.sprite.on("pointertap", this.onClicky, this);
         this.sprite.interactive = true;
+        this.sprite.x = pos[0];
+        this.sprite.y = pos[1];
         this.idx = idx;
         this.scnBattle = scnBattle;
 
         this.hp = stats[0];
         this.dmg = stats[1];
+
+        this.hpBar = new HpBar(pos[0], pos[1]*2/5, this.hp);
+    }
+
+    private updateHp(amount: number){
+        this.hp -= amount;
+        this.hpBar.updateHp(amount);
+    }
+
+    public getSprites(): Sprite[]{
+        let sprites: Sprite[] = this.hpBar.getSprites();
+        sprites.unshift(this.sprite);
+
+        return sprites;
     }
 
     private onClicky(e: InteractionEvent): void {
@@ -44,7 +60,7 @@ export class BattleCharacter extends utils.EventEmitter{
     }
 
     public onDamageReceived(amount: number): void{
-        this.hp -= amount;
+        this.updateHp(amount);
         console.log("Amount received: ", amount);
     }
 
