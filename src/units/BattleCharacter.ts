@@ -32,7 +32,8 @@ export class BattleCharacter extends utils.EventEmitter{
 
     private updateHp(amount: number){
         this.hp -= amount;
-        this.hpBar.updateHp(amount);
+        console.log(this.hpBar);
+        this.hpBar.updateHp(-amount);
     }
 
     public getSprites(): Sprite[]{

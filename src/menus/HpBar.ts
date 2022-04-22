@@ -28,6 +28,6 @@ export class HpBar{
 
     public updateHp(hpIncrease: number){
         this.currentValue = Math.max(0, Math.min(this.currentValue + hpIncrease, this.maxValue));
-        this.fullBar.scale.set(this.currentValue/this.maxValue,1);
+        this.fullBar.scale.x = this.currentValue/this.maxValue/2;
     }
 }

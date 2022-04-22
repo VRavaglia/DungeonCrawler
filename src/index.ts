@@ -8,7 +8,8 @@ const app = new Application({
 	autoDensity: true,
 	backgroundColor: 0x6495ed,
 	width: 640,
-	height: 480
+	height: 480,
+	resizeTo: window
 });
 
 let gameState: GameState = new GameState(2, 4);

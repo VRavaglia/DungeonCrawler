@@ -3,7 +3,6 @@ import { BattleCharacter } from './../units/BattleCharacter';
 import { GameState } from './../GameState';
 import {AttackMenu} from './../menus/AttackMenu';
 import { CombatEngine } from "../combat/CombatEngine";
-import { HpBar } from "../menus/HpBar";
 
 enum State{
     waiting,
@@ -84,13 +83,10 @@ export class ScnBattle extends Container {
             enemy.sprite.scale.set(-0.3, 0.3);
             
             this.enemies.push(enemy);
-            this.addChild(enemy.sprite);
+            let sprites = enemy.getSprites();
 
-            let hpBar = new HpBar(x, y*2/5, hp_dmg[0]);
-            let hpSprites = hpBar.getSprites();
-
-            for(let j = 0; j < hpSprites.length; j++){
-                this.addChild(hpSprites[j]);
+            for(let j = 0; j < sprites.length; j++){
+                this.addChild(sprites[j]);
             }
         }
     }
@@ -133,12 +129,18 @@ export class ScnBattle extends Container {
     private onCharacterDeath(): void{
         for (let i = 0; i < this.allies.length; i++){
             if(this.allies[i].hp <= 0){
-                this.removeChild(this.allies[i].sprite);
+                let sprites = this.allies[i].getSprites();
+                for(let j = 0; j < sprites.length; j++){
+                    this.removeChild(sprites[j]);
+                }           
             }
         }
         for (let i = 0; i < this.enemies.length; i++){
             if(this.enemies[i].hp <= 0){
-                this.removeChild(this.enemies[i].sprite);
+                let sprites = this.enemies[i].getSprites();
+                for(let j = 0; j < sprites.length; j++){
+                    this.removeChild(sprites[j]);
+                }    
             }
         }
     }
