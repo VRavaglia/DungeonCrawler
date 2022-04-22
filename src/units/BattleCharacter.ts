@@ -1,10 +1,16 @@
-import { Sprite, InteractionEvent, utils} from "pixi.js";
+import { AnimatedSprite, InteractionEvent, utils, Texture, Sprite} from "pixi.js";
 import { HpBar } from "../menus/HpBar";
 import { ScnBattle } from "../scenes/ScnBattle";
 
+export enum AnimTypes{
+    attack,
+    defend,
+    stand
+}
+
 export class BattleCharacter extends utils.EventEmitter{
 
-    public readonly sprite: Sprite;
+    public readonly sprite: AnimatedSprite;
     public idx: number;
     private scnBattle: ScnBattle;
     
@@ -14,13 +20,18 @@ export class BattleCharacter extends utils.EventEmitter{
     public receiveDamage: boolean = false;
     private hpBar: HpBar;
 
-    constructor(sprite: string, scnBattle: ScnBattle, idx: number, stats: number[], pos: number[]) {
+    constructor(scnBattle: ScnBattle, idx: number, stats: number[], pos: number[]) {
         super();
-        this.sprite = Sprite.from(sprite);
+        let frames = ["./unit/crusader.png",
+                        "./unit/crusader_attack.png"];
+
+        this.sprite = new AnimatedSprite(frames.map((s) => Texture.from(s)));
         this.sprite.on("pointertap", this.onClicky, this);
         this.sprite.interactive = true;
         this.sprite.x = pos[0];
         this.sprite.y = pos[1];
+        this.sprite.gotoAndStop(0);
+
         this.idx = idx;
         this.scnBattle = scnBattle;
 
@@ -41,6 +52,10 @@ export class BattleCharacter extends utils.EventEmitter{
         sprites.unshift(this.sprite);
 
         return sprites;
+    }
+
+    public playAnim(anim: AnimTypes){
+        console.log(anim);
     }
 
     private onClicky(e: InteractionEvent): void {

@@ -1,8 +1,9 @@
-import { Container } from "pixi.js";
+import { Container, Ticker } from "pixi.js";
 import { BattleCharacter } from './../units/BattleCharacter';
 import { GameState } from './../GameState';
 import {AttackMenu} from './../menus/AttackMenu';
-import { CombatEngine } from "../combat/CombatEngine";
+import { CombatEngine } from "../engines/CombatEngine";
+import { AnimationEngine } from "../engines/AnimationEngine";
 
 enum State{
     waiting,
@@ -28,6 +29,7 @@ export class ScnBattle extends Container {
 
     private atkMenu: AttackMenu;
     private cEngine: CombatEngine;
+    private aEngine: AnimationEngine;
 
     constructor(screenWidth: number, screenHeight: number, gameState: GameState) {
         super();
@@ -49,8 +51,16 @@ export class ScnBattle extends Container {
 
         this.atkMenu = new AttackMenu(this, screenWidth, screenHeight);
         this.cEngine = new CombatEngine();
+        this.aEngine = new AnimationEngine();
+
+        Ticker.shared.add(this.update, this);
          
     }
+
+    private update(deltaTime: number): void {
+        console.log(deltaTime);
+    }
+
     private initializeAllies(){
         for(var i = 0; i < this.allyCount; i++) {
             let hp_dmg = [10, 2];
@@ -58,7 +68,7 @@ export class ScnBattle extends Container {
             let y = this.screenHeight / 2;
             let pos = [x, y];
 
-            let ally = new BattleCharacter("./units/crusader.png", this, i, hp_dmg, pos);
+            let ally = new BattleCharacter(this, i, hp_dmg, pos);
             ally.sprite.anchor.set(0.5, 0.5);
             ally.sprite.scale.set(0.3, 0.3);          
 
@@ -78,7 +88,7 @@ export class ScnBattle extends Container {
             let x = this.screenWidth / 10 * (i+6);
             let y = this.screenHeight / 2;
             let pos = [x, y]
-            let enemy = new BattleCharacter("./units/crusader.png", this, i+this.allyCount, hp_dmg, pos);
+            let enemy = new BattleCharacter(this, i+this.allyCount, hp_dmg, pos);
             enemy.sprite.anchor.set(0.5, 0.5);
             enemy.sprite.scale.set(-0.3, 0.3);
             
@@ -114,6 +124,7 @@ export class ScnBattle extends Container {
                 
                 if (this.state == State.selectingTarget){
                     this.cEngine.attack(this.allies[this.source], [this.enemies[this.target]]);
+                    this.aEngine.attack(this.allies[this.source], [this.enemies[this.target]]);
                 }
             }
           
