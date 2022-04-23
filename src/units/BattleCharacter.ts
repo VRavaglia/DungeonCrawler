@@ -13,6 +13,7 @@ export class BattleCharacter extends utils.EventEmitter{
     public readonly sprite: AnimatedSprite;
     public idx: number;
     private scnBattle: ScnBattle;
+    private previousDims: number[] = [];
     
     public hp: number;
     public dmg: number;
@@ -22,15 +23,15 @@ export class BattleCharacter extends utils.EventEmitter{
 
     constructor(scnBattle: ScnBattle, idx: number, stats: number[], pos: number[]) {
         super();
-        let frames = ["./unit/crusader.png",
-                        "./unit/crusader_attack.png"];
+        let frames = ["./units/crusader.png",
+                        "./units/crusader_attack.png",
+                        "./units/crusader_defend.png"];
 
         this.sprite = new AnimatedSprite(frames.map((s) => Texture.from(s)));
         this.sprite.on("pointertap", this.onClicky, this);
         this.sprite.interactive = true;
         this.sprite.x = pos[0];
         this.sprite.y = pos[1];
-        this.sprite.gotoAndStop(0);
 
         this.idx = idx;
         this.scnBattle = scnBattle;
@@ -55,7 +56,29 @@ export class BattleCharacter extends utils.EventEmitter{
     }
 
     public playAnim(anim: AnimTypes){
-        console.log(anim);
+        switch(anim){
+            case AnimTypes.attack:{
+                this.previousDims = [this.sprite.x, this.sprite.y, this.sprite.scale.x, this.sprite.scale.y];
+                this.sprite.gotoAndStop(1);
+                this.sprite.scale.set(2*this.previousDims[2], 2*this.previousDims[3]);
+                break;
+            }
+            case AnimTypes.defend:{
+                this.previousDims = [this.sprite.x, this.sprite.y, this.sprite.scale.x, this.sprite.scale.y];
+                this.sprite.gotoAndStop(2);
+                this.sprite.scale.set(2*this.previousDims[2], 2*this.previousDims[3]);
+                break;
+            }
+            case AnimTypes.stand:{
+                this.sprite.gotoAndStop(0);
+                this.sprite.position.set(this.previousDims[0], this.previousDims[1]);
+                this.sprite.scale.set(this.previousDims[2], this.previousDims[3]);
+                break;
+            }
+            default:{
+                break;
+            }
+        }
     }
 
     private onClicky(e: InteractionEvent): void {

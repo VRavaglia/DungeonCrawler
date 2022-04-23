@@ -5,7 +5,7 @@ import {AttackMenu} from './../menus/AttackMenu';
 import { CombatEngine } from "../engines/CombatEngine";
 import { AnimationEngine } from "../engines/AnimationEngine";
 
-enum State{
+const enum BattleState{
     waiting,
     clickedAlly,
     clickedEnemy,
@@ -23,7 +23,7 @@ export class ScnBattle extends Container {
     public source: number = -1;
     public target: number = -1;
     
-    private state: State;
+    private state: BattleState;
     private allyCount : number;
     private enemyCount : number;
 
@@ -38,7 +38,7 @@ export class ScnBattle extends Container {
         this.screenHeight = screenHeight;
         this.allies = [];
         this.enemies = [];
-        this.state = State.waiting;
+        this.state = BattleState.waiting;
         this.allyCount = gameState.allies;
         this.enemyCount = gameState.enemies;
 
@@ -58,7 +58,8 @@ export class ScnBattle extends Container {
     }
 
     private update(deltaTime: number): void {
-        console.log(deltaTime);
+        this.aEngine.update(deltaTime/60);
+
     }
 
     private initializeAllies(){
@@ -75,6 +76,7 @@ export class ScnBattle extends Container {
             this.allies.push(ally);
 
             let sprites = ally.getSprites();
+            console.log(sprites);
 
             for(let j = 0; j < sprites.length; j++){
                 this.addChild(sprites[j]);
@@ -103,10 +105,14 @@ export class ScnBattle extends Container {
 
     private onChangedTarget(): void {
         console.log("BattleScene", this.lastClicked);
+
+        if(this.aEngine.isRunning()){
+            return
+        }     
         
         if (this.lastClicked < this.allyCount){
-            if (this.state != State.selectingTarget){
-                this.state = State.clickedAlly;
+            if (this.state != BattleState.selectingTarget){
+                this.state = BattleState.clickedAlly;
                 let sprites = this.atkMenu.allSprites();
                 for(let i = 0; i < sprites.length; i++){
                     this.addChild(sprites[i]);
@@ -114,7 +120,7 @@ export class ScnBattle extends Container {
                 this.source = this.lastClicked;
             }         
         }else{
-            if(this.state == State.clickedAlly || this.state == State.selectingTarget){
+            if(this.state == BattleState.clickedAlly || this.state == BattleState.selectingTarget){
                 let sprites = this.atkMenu.allSprites();
                 for(let i = 0; i < sprites.length; i++){
                     this.removeChild(sprites[i]);
@@ -122,18 +128,17 @@ export class ScnBattle extends Container {
 
                 this.target = this.lastClicked - this.allyCount;
                 
-                if (this.state == State.selectingTarget){
+                if (this.state == BattleState.selectingTarget){
                     this.cEngine.attack(this.allies[this.source], [this.enemies[this.target]]);
                     this.aEngine.attack(this.allies[this.source], [this.enemies[this.target]]);
                 }
             }
           
-            this.state = State.clickedEnemy;                 
+            this.state = BattleState.clickedEnemy;                 
         }
-        console.log(this.state);
     }
     private onAttack(): void{
-        this.state = State.selectingTarget;
+        this.state = BattleState.selectingTarget;
         console.log(this.state);
     }
 
