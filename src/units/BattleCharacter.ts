@@ -64,7 +64,7 @@ export class BattleCharacter extends utils.EventEmitter{
                 this.sprite.zIndex = 2;
                 this.sprite.position.set(this.scnBattle.screenWidth/5*2, this.scnBattle.screenHeight/2);
                 this.sprite.scale.set(2*this.previousDims[2], 2*this.previousDims[3]);
-                new Tween(this.sprite.position).to({ x: this.sprite.position.x+25, y: this.sprite.position.y }, 1000).repeat(0).yoyo(true).start();
+                new Tween(this.sprite.position).to({ x: this.sprite.position.x+25, y: this.sprite.position.y }, 900).repeat(0).yoyo(true).start();
                 break;
             }
             case AnimTypes.defend:{
@@ -73,7 +73,7 @@ export class BattleCharacter extends utils.EventEmitter{
                 this.sprite.zIndex = 1;
                 this.sprite.position.set(this.scnBattle.screenWidth/5*2.5, this.scnBattle.screenHeight/2);
                 this.sprite.scale.set(2*this.previousDims[2], 2*this.previousDims[3]);
-                new Tween(this.sprite.position).to({ x: this.sprite.position.x+15, y: this.sprite.position.y }, 1000).repeat(0).yoyo(true).start();
+                new Tween(this.sprite.position).to({ x: this.sprite.position.x+15, y: this.sprite.position.y }, 900).repeat(0).yoyo(true).start();
                 break;
             }
             case AnimTypes.stand:{
