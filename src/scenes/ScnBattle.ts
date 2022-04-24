@@ -13,8 +13,8 @@ const enum BattleState{
 };
 
 export class ScnBattle extends Container {
-    private readonly screenWidth: number;
-    private readonly screenHeight: number;
+    public readonly screenWidth: number;
+    public readonly screenHeight: number;
     
     private allies: BattleCharacter[];
     private enemies: BattleCharacter[];
@@ -60,6 +60,13 @@ export class ScnBattle extends Container {
     private update(deltaTime: number): void {
         this.aEngine.update(deltaTime/60);
 
+        this.children.sort(function(a,b){
+            if (a.zIndex > b.zIndex) return 1;
+            if (a.zIndex < b.zIndex) return -1;
+            if (a.position.x < b.position.x) return 1;
+            if (a.position.x > b.position.x) return -1;
+            return 0;
+        });
     }
 
     private initializeAllies(){
@@ -76,7 +83,6 @@ export class ScnBattle extends Container {
             this.allies.push(ally);
 
             let sprites = ally.getSprites();
-            console.log(sprites);
 
             for(let j = 0; j < sprites.length; j++){
                 this.addChild(sprites[j]);
@@ -104,7 +110,6 @@ export class ScnBattle extends Container {
     }
 
     private onChangedTarget(): void {
-        console.log("BattleScene", this.lastClicked);
 
         if(this.aEngine.isRunning()){
             return
@@ -139,7 +144,6 @@ export class ScnBattle extends Container {
     }
     private onAttack(): void{
         this.state = BattleState.selectingTarget;
-        console.log(this.state);
     }
 
     private onCharacterDeath(): void{

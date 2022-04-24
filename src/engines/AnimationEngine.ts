@@ -1,3 +1,4 @@
+import { Group } from "tweedle.js";
 import { AnimTypes, BattleCharacter } from "../units/BattleCharacter";
 
 export class AnimationEngine{
@@ -10,6 +11,7 @@ export class AnimationEngine{
         this.animsRunning = [source, targets[0]];
     }
     public update(deltaTime: number){
+        Group.shared.update();
         let lastFrame: Boolean = this.isRunning();
 
         this.remainingTime = Math.max(this.remainingTime - deltaTime, 0);

@@ -1,4 +1,5 @@
 import { AnimatedSprite, InteractionEvent, utils, Texture, Sprite} from "pixi.js";
+import { Tween } from "tweedle.js";
 import { HpBar } from "../menus/HpBar";
 import { ScnBattle } from "../scenes/ScnBattle";
 
@@ -32,6 +33,7 @@ export class BattleCharacter extends utils.EventEmitter{
         this.sprite.interactive = true;
         this.sprite.x = pos[0];
         this.sprite.y = pos[1];
+        // this.sprite.anchor.set(0.5, 0.5);
 
         this.idx = idx;
         this.scnBattle = scnBattle;
@@ -44,7 +46,6 @@ export class BattleCharacter extends utils.EventEmitter{
 
     private updateHp(amount: number){
         this.hp -= amount;
-        console.log(this.hpBar);
         this.hpBar.updateHp(-amount);
     }
 
@@ -60,17 +61,24 @@ export class BattleCharacter extends utils.EventEmitter{
             case AnimTypes.attack:{
                 this.previousDims = [this.sprite.x, this.sprite.y, this.sprite.scale.x, this.sprite.scale.y];
                 this.sprite.gotoAndStop(1);
+                this.sprite.zIndex = 2;
+                this.sprite.position.set(this.scnBattle.screenWidth/5*2, this.scnBattle.screenHeight/2);
                 this.sprite.scale.set(2*this.previousDims[2], 2*this.previousDims[3]);
+                new Tween(this.sprite.position).to({ x: this.sprite.position.x+25, y: this.sprite.position.y }, 1000).repeat(0).yoyo(true).start();
                 break;
             }
             case AnimTypes.defend:{
                 this.previousDims = [this.sprite.x, this.sprite.y, this.sprite.scale.x, this.sprite.scale.y];
                 this.sprite.gotoAndStop(2);
+                this.sprite.zIndex = 1;
+                this.sprite.position.set(this.scnBattle.screenWidth/5*2.5, this.scnBattle.screenHeight/2);
                 this.sprite.scale.set(2*this.previousDims[2], 2*this.previousDims[3]);
+                new Tween(this.sprite.position).to({ x: this.sprite.position.x+15, y: this.sprite.position.y }, 1000).repeat(0).yoyo(true).start();
                 break;
             }
             case AnimTypes.stand:{
                 this.sprite.gotoAndStop(0);
+                this.sprite.zIndex = 0;
                 this.sprite.position.set(this.previousDims[0], this.previousDims[1]);
                 this.sprite.scale.set(this.previousDims[2], this.previousDims[3]);
                 break;
@@ -89,7 +97,7 @@ export class BattleCharacter extends utils.EventEmitter{
 
     public onAttackReceived(source: BattleCharacter): void{
         this.receiveDamage = true;
-        console.log("Source: ", source);
+        console.log(source);
     }
 
     public onAttackDelt(targets: BattleCharacter[]): void{
@@ -100,7 +108,6 @@ export class BattleCharacter extends utils.EventEmitter{
 
     public onDamageReceived(amount: number): void{
         this.updateHp(amount);
-        console.log("Amount received: ", amount);
     }
 
     public onDamageDelt(amount: number): void{
